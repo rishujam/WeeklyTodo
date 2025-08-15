@@ -37,5 +37,6 @@ val Typography = Typography(
 
 val InterFont = FontFamily(
     Font(R.font.inter_font, FontWeight.Normal),
+    Font(R.font.inter_font_semi_bold, FontWeight.SemiBold),
     Font(R.font.inter_font_bold, FontWeight.Bold)
 )
