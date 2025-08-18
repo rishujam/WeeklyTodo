@@ -1,8 +1,9 @@
-package com.weekly.todo
+package com.weekly.todo.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,17 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.weekly.todo.R
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
 import com.weekly.todo.ui.theme.Outline
@@ -249,26 +250,36 @@ fun BarGraph(
     barWidth: Float = 120f,
     spaceBetweenBars: Float = 40f
 ) {
+    val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(16.dp)
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val canvasHeight = size.height
+        Row(
+            modifier = Modifier
+                .horizontalScroll(scrollState)
+        ) {
+            Canvas(
+                modifier = Modifier
+                    .width((values.size * (barWidth + spaceBetweenBars)).dp)
+                    .fillMaxHeight()
+            ) {
+                val canvasHeight = size.height
 
-            values.forEachIndexed { index, value ->
-                val barHeight = (value / maxValue) * canvasHeight
-                val left = index * (barWidth + spaceBetweenBars)
-                val top = canvasHeight - barHeight
+                values.forEachIndexed { index, value ->
+                    val barHeight = (value / maxValue) * canvasHeight
+                    val left = index * (barWidth + spaceBetweenBars)
+                    val top = canvasHeight - barHeight
 
-                drawRoundRect(
-                    color = Primary,
-                    topLeft = Offset(left, top),
-                    size = Size(barWidth, barHeight),
-                    cornerRadius = CornerRadius(10f, 10f)
-                )
+                    drawRoundRect(
+                        color = Primary,
+                        topLeft = Offset(left, top),
+                        size = Size(barWidth, barHeight),
+                        cornerRadius = CornerRadius(10f, 10f)
+                    )
+                }
             }
         }
     }

@@ -1,11 +1,14 @@
-package com.weekly.todo
+package com.weekly.todo.data
+
+import com.weekly.todo.data.model.Habit
+import com.weekly.todo.data.model.Week
 
 object Data {
 
-    fun getData(): List<WeekData> {
+    fun getData(): List<Week> {
         return listOf(
-            WeekData(
-                weekId = "Week 1",
+            Week(
+                weekNo = 1,
                 weekRange = "Aug 5 - Aug 11",
                 habits = listOf(
                     Habit(
@@ -34,8 +37,8 @@ object Data {
                     )
                 )
             ),
-            WeekData(
-                weekId = "Week 2",
+            Week(
+                weekNo = 2,
                 weekRange = "July 28 - Aug 4",
                 habits = listOf(
                     Habit(
@@ -64,8 +67,8 @@ object Data {
                     )
                 )
             ),
-            WeekData(
-                weekId = "Week 3",
+            Week(
+                weekNo = 3,
                 weekRange = "July 20 - July 27",
                 habits = listOf(
                     Habit(
@@ -94,8 +97,8 @@ object Data {
                     )
                 )
             ),
-            WeekData(
-                weekId = "Week 4",
+            Week(
+                weekNo = 4,
                 weekRange = "July 12 - July 19",
                 habits = listOf(
                     Habit(
@@ -124,8 +127,8 @@ object Data {
                     )
                 )
             ),
-            WeekData(
-                weekId = "Week 5",
+            Week(
+                weekNo = 5,
                 weekRange = "July 4 - July 11",
                 habits = listOf(
                     Habit(
@@ -157,17 +160,3 @@ object Data {
         )
     }
 }
-
-data class WeekData(
-    val weekId: String,
-    val weekRange: String,
-    val habits: List<Habit>
-)
-
-data class Habit(
-    val id: String,
-    val title: String,
-    val maxWeight: Int,
-    val progress: Int,
-    val dateCreated: Long = System.currentTimeMillis()
-)

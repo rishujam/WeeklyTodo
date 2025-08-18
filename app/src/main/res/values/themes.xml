@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.WeeklyTodo" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.WeeklyTodo.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/week_icon</item>
+        <item name="postSplashScreenTheme">@style/Theme.WeeklyTodo</item>
+    </style>
 </resources>

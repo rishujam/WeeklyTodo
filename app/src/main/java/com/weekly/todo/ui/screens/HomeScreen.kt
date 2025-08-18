@@ -1,4 +1,4 @@
-package com.weekly.todo
+package com.weekly.todo.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,8 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.weekly.todo.data.Data
+import com.weekly.todo.data.model.Week
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
 import com.weekly.todo.ui.theme.Outline
@@ -53,6 +53,7 @@ import com.weekly.todo.ui.theme.TextDark
 import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import kotlin.math.roundToInt
+import com.weekly.todo.data.model.Habit
 
 @Composable
 fun HomeScreen(modifier: Modifier) {
@@ -104,7 +105,7 @@ fun HomeScreen(modifier: Modifier) {
 }
 
 @Composable
-fun WeekComposable(weekData: WeekData, isLastItem: Boolean) {
+fun WeekComposable(week: Week, isLastItem: Boolean) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val paddingEnd = if (isLastItem) 16.dp else 0.dp
@@ -118,7 +119,7 @@ fun WeekComposable(weekData: WeekData, isLastItem: Boolean) {
     ) {
         Text(
             modifier = Modifier.padding(start = 16.dp, top = 20.dp),
-            text = weekData.weekId,
+            text = "Week ${week.weekNo}",
             fontSize = 20.sp,
             fontFamily = InterFont,
             fontWeight = FontWeight.Bold,
@@ -126,7 +127,7 @@ fun WeekComposable(weekData: WeekData, isLastItem: Boolean) {
         )
         Text(
             modifier = Modifier.padding(start = 16.dp, top = 4.dp),
-            text = weekData.weekRange,
+            text = week.weekRange,
             fontSize = 14.sp,
             fontFamily = InterFont,
             color = TextLight
@@ -139,7 +140,7 @@ fun WeekComposable(weekData: WeekData, isLastItem: Boolean) {
                 .height(1.dp)
         )
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(weekData.habits) { index, habit ->
+            itemsIndexed(week.habits) { index, habit ->
                 HabitComposable(habit) {
 
                 }
