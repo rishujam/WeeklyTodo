@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.weekly.todo.ui.screens.HomeScreen
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
+import com.weekly.todo.util.ResultState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -28,10 +33,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeeklyTodoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeScreen(Modifier.padding(innerPadding))
+                    HomeScreen(viewModel.state, Modifier.padding(innerPadding))
                 }
             }
         }
     }
-
 }

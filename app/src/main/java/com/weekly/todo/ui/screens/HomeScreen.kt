@@ -1,5 +1,6 @@
 package com.weekly.todo.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -54,15 +55,17 @@ import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import kotlin.math.roundToInt
 import com.weekly.todo.data.model.Habit
+import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
+import com.weekly.todo.util.ResultState
 
 @Composable
-fun HomeScreen(modifier: Modifier) {
+fun HomeScreen(screenData: ScreenData, modifier: Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Background)
     ) {
-        val data = Data.getData()
         Text(
             modifier = Modifier.padding(start = 16.dp, top = 24.dp),
             text = "Habit Tracker",
@@ -73,32 +76,37 @@ fun HomeScreen(modifier: Modifier) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Column {
-            val state = rememberLazyListState()
-            val flingBehavior = rememberSnapFlingBehavior(state)
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state = state,
-                flingBehavior = flingBehavior
-            ) {
-                itemsIndexed(data) { index, item ->
-                    WeekComposable(item, index == data.size - 1)
+            val weeks = screenData.weeks
+            if(weeks is ResultState.Success && weeks.data != null) {
+                val state = rememberLazyListState()
+                val flingBehavior = rememberSnapFlingBehavior(state)
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    state = state,
+                    flingBehavior = flingBehavior
+                ) {
+                    itemsIndexed(weeks.data) { index, item ->
+                        WeekComposable(item, index == weeks.data.size - 1)
+                    }
                 }
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                FloatingActionButton(
-                    containerColor = Primary,
-                    contentColor = Color.White,
-                    modifier = Modifier.size(48.dp),
-                    shape = CircleShape,
-                    onClick = {}) {
-                    Icon(Icons.Outlined.Add, contentDescription = "")
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    FloatingActionButton(
+                        containerColor = Primary,
+                        contentColor = Color.White,
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        onClick = {}) {
+                        Icon(Icons.Outlined.Add, contentDescription = "")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            } else if(weeks is ResultState.Error) {
+                Log.d(DEBUG_LOG_TAG, "Error loading weeks")
             }
-            Spacer(modifier = Modifier.height(24.dp))
         }
 
     }
@@ -219,6 +227,9 @@ fun HabitComposable(
 @Composable
 fun HomeScreenPreview() {
     WeeklyTodoTheme {
-        HomeScreen(Modifier)
+        HomeScreen(
+            ScreenData(weeks = ResultState.Success(Data.getData())),
+            Modifier
+        )
     }
 }

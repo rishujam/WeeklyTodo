@@ -8,6 +8,10 @@ class WeekRepositoryImpl @Inject constructor(
     private val dao: WeekDao
 ) : WeekRepository {
 
+    override suspend fun addWeeks(weeks: List<Week>) {
+        dao.upsert(weeks)
+    }
+
     override suspend fun addWeek(week: Week) {
         dao.upsert(week)
     }

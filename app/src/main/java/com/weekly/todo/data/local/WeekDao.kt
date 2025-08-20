@@ -9,6 +9,9 @@ import com.weekly.todo.data.model.Week
 interface WeekDao {
 
     @Upsert
+    suspend fun upsert(weeks: List<Week>)
+
+    @Upsert
     suspend fun upsert(week: Week)
 
     @Query("SELECT * FROM weeks")
