@@ -68,11 +68,13 @@ fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
         var habit: Habit? = null
         var totalWeeks = 0
         var totalProgress = 0
+        val progressList = mutableListOf<Float>()
         for(week in weeks) {
             val localHabit = week.habits.find { it.id == habitId }
             if(localHabit != null) {
                 habit = localHabit
                 totalWeeks++
+                progressList.add(localHabit.progress.toFloat())
                 totalProgress += localHabit.progress
             }
         }
@@ -101,7 +103,7 @@ fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
                             color = TextDark,
                             fontWeight = FontWeight.SemiBold
                         )
-                        BarGraph(listOf(3f, 4f, 0f, 1f, 7f), maxValue = 7f)
+                        BarGraph(progressList, maxValue = habit.maxWeight.toFloat())
                     }
                 }
                 Column(

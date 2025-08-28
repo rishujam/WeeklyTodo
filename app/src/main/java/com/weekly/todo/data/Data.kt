@@ -45,7 +45,7 @@ object Data {
                         id = 1,
                         title = "Exercise",
                         maxWeight = 4,
-                        progress = 1,
+                        progress = 2,
                     ),
                     Habit(
                         id = 2,
@@ -75,7 +75,7 @@ object Data {
                         id = 1,
                         title = "Exercise",
                         maxWeight = 4,
-                        progress = 1,
+                        progress = 4,
                     ),
                     Habit(
                         id = 2,
@@ -105,7 +105,7 @@ object Data {
                         id = 1,
                         title = "Exercise",
                         maxWeight = 4,
-                        progress = 1,
+                        progress = 0,
                     ),
                     Habit(
                         id = 2,
@@ -135,7 +135,7 @@ object Data {
                         id = 1,
                         title = "Exercise",
                         maxWeight = 4,
-                        progress = 1,
+                        progress = 3,
                     ),
                     Habit(
                         id = 2,
