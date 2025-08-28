@@ -9,4 +9,5 @@ sealed class UIEvent {
         val updatedHabit: Habit,
         val week: Week
     ) : UIEvent()
+    data class DeleteHabit(val habit: Habit, val week: Week) : UIEvent()
 }

@@ -41,7 +41,10 @@ class MainViewModel @Inject constructor (
                 addNewHabit(newHabit = event.habit)
             }
             is UIEvent.HabitProgressUpdate -> {
-                updateHabitProgress(event.updatedHabit, event.week)
+                updateHabit(event.updatedHabit, event.week)
+            }
+            is UIEvent.DeleteHabit -> {
+                deleteHabit(event.habit.id, event.week)
             }
         }
     }
@@ -142,7 +145,7 @@ class MainViewModel @Inject constructor (
         return weeks
     }
 
-    private fun updateHabitProgress(updatedHabit: Habit, week: Week) = viewModelScope.launch {
+    private fun updateHabit(updatedHabit: Habit, week: Week) = viewModelScope.launch {
         val updatedHabits = week.habits.toMutableList()
         val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
         if (index != -1) {
@@ -151,6 +154,23 @@ class MainViewModel @Inject constructor (
         } else {
             state = state.copy(
                 weeks = ResultState.Error("Cannot Update Habit: Habit with id=${updatedHabit.id} not found in week ${week.weekRange}")
+            )
+        }
+    }
+
+    private fun deleteHabit(habitId: Int, week: Week) = viewModelScope.launch {
+        val updatedHabits = week.habits.toMutableList()
+        val index = updatedHabits.indexOfFirst { it.id == habitId }
+        if (index != -1) {
+            updatedHabits.removeAt(index)
+            repo.updateHabits(week.weekRange, updatedHabits)
+            val weeks = repo.getWeeks()
+            state = state.copy(
+                weeks = ResultState.Success(weeks)
+            )
+        } else {
+            state = state.copy(
+                weeks = ResultState.Error("Error deleting habit.")
             )
         }
     }

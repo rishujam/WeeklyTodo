@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
@@ -36,18 +36,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.weekly.todo.R
 import com.weekly.todo.data.Data
 import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
-import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.UIEvent
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
 import com.weekly.todo.ui.theme.Outline
@@ -56,13 +57,18 @@ import com.weekly.todo.ui.theme.TextDark
 import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WarningRed
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
-import com.weekly.todo.util.ResultState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
+fun HabitScreen(
+    habitId: Int?,
+    weeks: List<Week>,
+    modifier: Modifier,
+    navHostController: NavHostController,
+    onEvent: (UIEvent) -> Unit
+) {
     val context = LocalContext.current
     habitId?.let {
         var habit: Habit? = null
@@ -242,7 +248,14 @@ fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
                             }
                         }
                     }
-                    Row(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                        text = "* Deletes the habit from the ongoing week only.",
+                        fontSize = 12.sp,
+                        color = TextLight,
+                        fontFamily = InterFont
+                    )
+                    Row(modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp)) {
                         val myId = "inlineContent"
                         val text = buildAnnotatedString {
                             appendInlineContent(myId, "[icon]")
@@ -267,7 +280,11 @@ fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(WarningRed)
-                                .padding(vertical = 12.dp),
+                                .padding(vertical = 12.dp)
+                                .clickable {
+                                    onEvent(UIEvent.DeleteHabit(habit, weeks.last()))
+                                    navHostController.navigateUp()
+                                },
                             textAlign = TextAlign.Center,
                             color = Color.White,
                             text = text,
@@ -331,7 +348,7 @@ fun BarGraph(
 @Composable
 fun HabitScreenPreview() {
     WeeklyTodoTheme {
-        HabitScreen(1, Data.getData(), Modifier)
+        HabitScreen(1, Data.getData(), navHostController = rememberNavController(), modifier =  Modifier) {}
     }
 }
 
