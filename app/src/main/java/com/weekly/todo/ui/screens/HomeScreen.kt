@@ -44,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.weekly.todo.data.Data
 import com.weekly.todo.data.model.Week
 import com.weekly.todo.ui.theme.Background
@@ -60,7 +62,11 @@ import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import com.weekly.todo.util.ResultState
 
 @Composable
-fun HomeScreen(screenData: ScreenData, modifier: Modifier) {
+fun HomeScreen(
+    screenData: ScreenData,
+    modifier: Modifier,
+    navHostController: NavHostController
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -229,7 +235,8 @@ fun HomeScreenPreview() {
     WeeklyTodoTheme {
         HomeScreen(
             ScreenData(weeks = ResultState.Success(Data.getData())),
-            Modifier
+            Modifier,
+            navHostController = rememberNavController()
         )
     }
 }

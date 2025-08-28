@@ -24,7 +24,7 @@ class HabitListTypeConverter {
         return data.split(";").map { habitStr ->
             val parts = habitStr.split("|")
             Habit(
-                id = parts[0],
+                id = parts[0].toIntOrNull() ?: 0,
                 title = parts[1].replace("\\;", ";"),
                 maxWeight = parts[2].toInt(),
                 progress = parts[3].toInt(),

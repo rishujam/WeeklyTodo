@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.weekly.todo.R
+import com.weekly.todo.ui.ScreenData
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
 import com.weekly.todo.ui.theme.Outline
@@ -50,9 +51,10 @@ import com.weekly.todo.ui.theme.TextDark
 import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WarningRed
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
+import com.weekly.todo.util.ResultState
 
 @Composable
-fun HabitScreen() {
+fun HabitScreen(habitId: Int?, screenData: ScreenData) {
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -289,6 +291,6 @@ fun BarGraph(
 @Composable
 fun HabitScreenPreview() {
     WeeklyTodoTheme {
-        HabitScreen()
+        HabitScreen(1, ScreenData(ResultState.Success(emptyList())))
     }
 }

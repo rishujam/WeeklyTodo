@@ -12,25 +12,25 @@ object Data {
                 weekRange = "Aug 5 - Aug 11",
                 habits = listOf(
                     Habit(
-                        id = "1",
+                        id = 1,
                         title = "Exercise",
                         maxWeight = 4,
                         progress = 1,
                     ),
                     Habit(
-                        id = "2",
+                        id = 2,
                         title = "Content Creation",
                         maxWeight = 1,
                         progress = 0
                     ),
                     Habit(
-                        id = "3",
+                        id = 3,
                         title = "Diet",
                         maxWeight = 7,
                         progress = 7
                     ),
                     Habit(
-                        id = "4",
+                        id = 4,
                         title = "Travel App",
                         maxWeight = 3,
                         progress = 2
@@ -42,25 +42,25 @@ object Data {
                 weekRange = "July 28 - Aug 4",
                 habits = listOf(
                     Habit(
-                        id = "1",
+                        id = 1,
                         title = "Exercise",
                         maxWeight = 4,
                         progress = 1,
                     ),
                     Habit(
-                        id = "2",
+                        id = 2,
                         title = "Content Creation",
                         maxWeight = 1,
                         progress = 0
                     ),
                     Habit(
-                        id = "3",
+                        id = 3,
                         title = "Diet",
                         maxWeight = 7,
                         progress = 7
                     ),
                     Habit(
-                        id = "4",
+                        id = 4,
                         title = "Travel App",
                         maxWeight = 3,
                         progress = 2
@@ -72,25 +72,25 @@ object Data {
                 weekRange = "July 20 - July 27",
                 habits = listOf(
                     Habit(
-                        id = "1",
+                        id = 1,
                         title = "Exercise",
                         maxWeight = 4,
                         progress = 1,
                     ),
                     Habit(
-                        id = "2",
+                        id = 2,
                         title = "Content Creation",
                         maxWeight = 1,
                         progress = 0
                     ),
                     Habit(
-                        id = "3",
+                        id = 3,
                         title = "Diet",
                         maxWeight = 7,
                         progress = 7
                     ),
                     Habit(
-                        id = "4",
+                        id = 4,
                         title = "Travel App",
                         maxWeight = 3,
                         progress = 2
@@ -102,25 +102,25 @@ object Data {
                 weekRange = "July 12 - July 19",
                 habits = listOf(
                     Habit(
-                        id = "1",
+                        id = 1,
                         title = "Exercise",
                         maxWeight = 4,
                         progress = 1,
                     ),
                     Habit(
-                        id = "2",
+                        id = 2,
                         title = "Content Creation",
                         maxWeight = 1,
                         progress = 0
                     ),
                     Habit(
-                        id = "3",
+                        id = 3,
                         title = "Diet",
                         maxWeight = 7,
                         progress = 7
                     ),
                     Habit(
-                        id = "4",
+                        id = 4,
                         title = "Travel App",
                         maxWeight = 3,
                         progress = 2
@@ -132,25 +132,25 @@ object Data {
                 weekRange = "July 4 - July 11",
                 habits = listOf(
                     Habit(
-                        id = "1",
+                        id = 1,
                         title = "Exercise",
                         maxWeight = 4,
                         progress = 1,
                     ),
                     Habit(
-                        id = "2",
+                        id = 2,
                         title = "Content Creation",
                         maxWeight = 1,
                         progress = 0
                     ),
                     Habit(
-                        id = "3",
+                        id = 3,
                         title = "Diet",
                         maxWeight = 7,
                         progress = 7
                     ),
                     Habit(
-                        id = "4",
+                        id = 4,
                         title = "Travel App",
                         maxWeight = 3,
                         progress = 2

@@ -10,6 +10,7 @@ import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
 import com.weekly.todo.data.repo.WeekRepository
 import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.UIEvent
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import com.weekly.todo.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +38,31 @@ class MainViewModel @Inject constructor (
     }
 
     var state by mutableStateOf(ScreenData(ResultState.Loading()))
+
+    fun onEvent(event: UIEvent) {
+        when(event) {
+            is UIEvent.NewHabitCreated -> {
+                addNewHabit(newHabit = event.habit)
+            }
+        }
+    }
+
+    private fun addNewHabit(newHabit: Habit) = viewModelScope.launch {
+        state.weeks.data?.last()?.let { currentWeek ->
+            val habit = newHabit.copy(
+                id = currentWeek.habits.last().id + 1
+            )
+            val currentWeekId = currentWeek.weekRange
+            val updatedHabits = currentWeek.habits.toMutableList()
+            updatedHabits.add(habit)
+            repo.updateHabits(currentWeekId, updatedHabits)
+            state = state.copy(weeks = ResultState.Loading())
+            val weeks = repo.getWeeks()
+            state = state.copy(weeks = ResultState.Success(weeks))
+        } ?: run {
+
+        }
+    }
 
     private fun onAppStart() = viewModelScope.launch {
         val weeks = repo.getWeeks()

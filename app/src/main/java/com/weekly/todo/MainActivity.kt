@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.weekly.todo.ui.navigation.NavigationStack
 import com.weekly.todo.ui.screens.HomeScreen
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import com.weekly.todo.util.ResultState
@@ -33,7 +34,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeeklyTodoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeScreen(viewModel.state, Modifier.padding(innerPadding))
+                    NavigationStack(
+                        modifier = Modifier.padding(innerPadding),
+                        screenData = viewModel.state,
+                        onEvent = viewModel::onEvent
+                    )
                 }
             }
         }

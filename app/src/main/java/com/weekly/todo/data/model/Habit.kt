@@ -1,9 +1,9 @@
 package com.weekly.todo.data.model
 
 data class Habit(
-    val id: String,
+    val id: Int,
     val title: String,
     val maxWeight: Int,
-    val progress: Int,
+    val progress: Int = 0,
     val dateCreated: Long = System.currentTimeMillis()
 )

@@ -1,6 +1,7 @@
 package com.weekly.todo.data.repo
 
 import com.weekly.todo.data.local.WeekDao
+import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
 import javax.inject.Inject
 
@@ -18,5 +19,9 @@ class WeekRepositoryImpl @Inject constructor(
 
     override suspend fun getWeeks(): List<Week> {
         return dao.getWeeks()
+    }
+
+    override suspend fun updateHabits(weekRange: String, habits: List<Habit>) {
+        return dao.updateHabits(weekRange, habits)
     }
 }
