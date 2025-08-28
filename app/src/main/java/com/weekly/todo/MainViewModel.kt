@@ -49,8 +49,14 @@ class MainViewModel @Inject constructor (
 
     private fun addNewHabit(newHabit: Habit) = viewModelScope.launch {
         state.weeks.data?.last()?.let { currentWeek ->
+            state = state.copy(
+                weeks = ResultState.Loading()
+            )
+            val id = if(currentWeek.habits.isEmpty()) 1 else {
+                currentWeek.habits.last().id + 1
+            }
             val habit = newHabit.copy(
-                id = currentWeek.habits.last().id + 1
+                id = id
             )
             val currentWeekId = currentWeek.weekRange
             val updatedHabits = currentWeek.habits.toMutableList()
@@ -58,9 +64,13 @@ class MainViewModel @Inject constructor (
             repo.updateHabits(currentWeekId, updatedHabits)
             state = state.copy(weeks = ResultState.Loading())
             val weeks = repo.getWeeks()
-            state = state.copy(weeks = ResultState.Success(weeks))
+            state = state.copy(
+                weeks = ResultState.Success(weeks)
+            )
         } ?: run {
-
+            state = state.copy(
+                weeks = ResultState.Error("Unknown Error")
+            )
         }
     }
 

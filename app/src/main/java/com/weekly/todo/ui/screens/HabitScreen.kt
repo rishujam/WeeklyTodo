@@ -54,8 +54,8 @@ import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import com.weekly.todo.util.ResultState
 
 @Composable
-fun HabitScreen(habitId: Int?, screenData: ScreenData) {
-    Column(modifier = Modifier.fillMaxSize()) {
+fun HabitScreen(habitId: Int?, screenData: ScreenData, modifier: Modifier) {
+    Column(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -291,6 +291,6 @@ fun BarGraph(
 @Composable
 fun HabitScreenPreview() {
     WeeklyTodoTheme {
-        HabitScreen(1, ScreenData(ResultState.Success(emptyList())))
+        HabitScreen(1, ScreenData(ResultState.Success(emptyList())), Modifier)
     }
 }

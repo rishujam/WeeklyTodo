@@ -35,7 +35,7 @@ fun UnderlinedTextField(
 ) {
     Column(modifier = modifier) {
         BasicTextField(
-            decorationBox = {
+            decorationBox = { innerTextField ->
                 if (value.isEmpty()) {
                     Text(
                         text = hint,
@@ -47,9 +47,16 @@ fun UnderlinedTextField(
                         )
                     )
                 }
+                innerTextField()
             },
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { input ->
+                if (keyboardType == KeyboardType.Number) {
+                    onValueChange(input.filter { it.isDigit() })
+                } else {
+                    onValueChange(input)
+                }
+            },
             textStyle = TextStyle(
                 fontSize = 24.sp,
                 fontFamily = InterFont,

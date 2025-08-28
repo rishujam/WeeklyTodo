@@ -33,10 +33,10 @@ fun NavigationStack(
                 }
             )
         ) {
-            HabitScreen(habitId = it.arguments?.getInt("habitId"), screenData)
+            HabitScreen(habitId = it.arguments?.getInt("habitId"), screenData, modifier)
         }
         composable(route = Screen.HabitCreation.route) {
-            HabitCreationScreen {
+            HabitCreationScreen(modifier, navController) {
                 onEvent(UIEvent.NewHabitCreated(it))
             }
         }

@@ -58,6 +58,7 @@ import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import kotlin.math.roundToInt
 import com.weekly.todo.data.model.Habit
 import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.navigation.Screen
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import com.weekly.todo.util.ResultState
 
@@ -83,7 +84,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         Column {
             val weeks = screenData.weeks
-            if(weeks is ResultState.Success && weeks.data != null) {
+            if (weeks is ResultState.Success && weeks.data != null) {
                 val state = rememberLazyListState()
                 val flingBehavior = rememberSnapFlingBehavior(state)
                 LazyRow(
@@ -104,13 +105,16 @@ fun HomeScreen(
                         contentColor = Color.White,
                         modifier = Modifier.size(48.dp),
                         shape = CircleShape,
-                        onClick = {}) {
+                        onClick = {
+                            navHostController.navigate(Screen.HabitCreation.route)
+                        }
+                    ) {
                         Icon(Icons.Outlined.Add, contentDescription = "")
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-            } else if(weeks is ResultState.Error) {
+            } else if (weeks is ResultState.Error) {
                 Log.d(DEBUG_LOG_TAG, "Error loading weeks")
             }
         }

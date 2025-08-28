@@ -1,5 +1,6 @@
 package com.weekly.todo.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,12 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.weekly.todo.data.model.Habit
 import com.weekly.todo.ui.composables.UnderlinedTextField
 import com.weekly.todo.ui.theme.Background
@@ -39,9 +43,14 @@ import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 
 @Composable
-fun HabitCreationScreen(onSaveClick: (habit: Habit) -> Unit) {
+fun HabitCreationScreen(
+    modifier: Modifier,
+    navHostController: NavHostController,
+    onSaveClick: (habit: Habit) -> Unit
+) {
+    val context = LocalContext.current
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Background)
     ) {
@@ -66,13 +75,16 @@ fun HabitCreationScreen(onSaveClick: (habit: Habit) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 32.dp)
+                .background(Background),
             verticalArrangement = Arrangement.Center
         ) {
             UnderlinedTextField(
                 hint = "Habit Name",
                 value = habitTitle,
-                onValueChange = { habitTitle = it }
+                onValueChange = {
+                    habitTitle = it
+                }
             )
             Spacer(Modifier
                 .fillMaxWidth()
@@ -103,7 +115,7 @@ fun HabitCreationScreen(onSaveClick: (habit: Habit) -> Unit) {
                             habitWeight.isNotBlank() &&
                             habitWeight.isNotEmpty() &&
                             habitWeight.toInt() >= 0
-                        )
+                        ) {
                             onSaveClick(
                                 Habit(
                                     id = 0, // Id is created in viewModel
@@ -111,6 +123,10 @@ fun HabitCreationScreen(onSaveClick: (habit: Habit) -> Unit) {
                                     maxWeight = habitWeight.toInt(),
                                 )
                             )
+                            navHostController.navigateUp()
+                        } else {
+                            Toast.makeText(context, "Invalid Inputs", Toast.LENGTH_SHORT).show()
+                        }
                     },
                 textAlign = TextAlign.Center,
                 color = Color.White,
@@ -127,6 +143,6 @@ fun HabitCreationScreen(onSaveClick: (habit: Habit) -> Unit) {
 @Composable
 fun HabitCreationScreenPreview() {
     WeeklyTodoTheme {
-        HabitCreationScreen {}
+        HabitCreationScreen(Modifier, rememberNavController()) {}
     }
 }
