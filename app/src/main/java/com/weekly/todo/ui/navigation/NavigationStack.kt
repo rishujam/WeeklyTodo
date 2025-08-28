@@ -22,7 +22,12 @@ fun NavigationStack(
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            HomeScreen(navHostController = navController, modifier = modifier, screenData = screenData)
+            HomeScreen(
+                navHostController = navController,
+                modifier = modifier,
+                screenData = screenData,
+                onEvent = onEvent
+            )
         }
         composable(
             route = Screen.Habit.route + "?habitId={habitId}",

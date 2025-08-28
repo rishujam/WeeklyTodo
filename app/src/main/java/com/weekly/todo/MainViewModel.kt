@@ -14,10 +14,6 @@ import com.weekly.todo.ui.UIEvent
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import com.weekly.todo.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -43,6 +39,9 @@ class MainViewModel @Inject constructor (
         when(event) {
             is UIEvent.NewHabitCreated -> {
                 addNewHabit(newHabit = event.habit)
+            }
+            is UIEvent.HabitProgressUpdate -> {
+                updateHabitProgress(event.updatedHabit, event.week)
             }
         }
     }
@@ -141,6 +140,19 @@ class MainViewModel @Inject constructor (
             weekNo++
         }
         return weeks
+    }
+
+    private fun updateHabitProgress(updatedHabit: Habit, week: Week) = viewModelScope.launch {
+        val updatedHabits = week.habits.toMutableList()
+        val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
+        if (index != -1) {
+            updatedHabits[index] = updatedHabit
+            repo.updateHabits(week.weekRange, updatedHabits)
+        } else {
+            state = state.copy(
+                weeks = ResultState.Error("Cannot Update Habit: Habit with id=${updatedHabit.id} not found in week ${week.weekRange}")
+            )
+        }
     }
 
 }

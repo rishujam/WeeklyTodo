@@ -1,6 +1,7 @@
 package com.weekly.todo.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,7 +49,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.weekly.todo.data.Data
+import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
+import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.UIEvent
+import com.weekly.todo.ui.navigation.Screen
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
 import com.weekly.todo.ui.theme.Outline
@@ -55,19 +61,18 @@ import com.weekly.todo.ui.theme.Primary
 import com.weekly.todo.ui.theme.TextDark
 import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
-import kotlin.math.roundToInt
-import com.weekly.todo.data.model.Habit
-import com.weekly.todo.ui.ScreenData
-import com.weekly.todo.ui.navigation.Screen
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import com.weekly.todo.util.ResultState
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
     screenData: ScreenData,
     modifier: Modifier,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    onEvent: (UIEvent) -> Unit
 ) {
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -95,7 +100,11 @@ fun HomeScreen(
                     flingBehavior = flingBehavior
                 ) {
                     itemsIndexed(weeks.data) { index, item ->
-                        WeekComposable(item, index == weeks.data.size - 1)
+                        WeekComposable(
+                            item,
+                            index == weeks.data.size - 1,
+                            onEvent
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -115,7 +124,10 @@ fun HomeScreen(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             } else if (weeks is ResultState.Error) {
+                Toast.makeText(context, weeks.message, Toast.LENGTH_SHORT).show()
                 Log.d(DEBUG_LOG_TAG, "Error loading weeks")
+            } else {
+                Log.d(DEBUG_LOG_TAG, "Loading weeks")
             }
         }
 
@@ -123,7 +135,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun WeekComposable(week: Week, isLastItem: Boolean) {
+fun WeekComposable(week: Week, isLastItem: Boolean, onEvent: (UIEvent) -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val paddingEnd = if (isLastItem) 16.dp else 0.dp
@@ -160,7 +172,12 @@ fun WeekComposable(week: Week, isLastItem: Boolean) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(week.habits) { index, habit ->
                 HabitComposable(habit) {
-
+                    onEvent(
+                        UIEvent.HabitProgressUpdate(
+                            habit.copy(progress = it),
+                            week
+                        )
+                    )
                 }
             }
         }
@@ -223,7 +240,7 @@ fun HabitComposable(
             )
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                text = habit.progress.toString() + " / " + habit.maxWeight,
+                text = dragProgress.toInt().toString() + " / " + habit.maxWeight,
                 fontSize = 14.sp,
                 fontFamily = InterFont,
                 color = TextDark
@@ -241,6 +258,8 @@ fun HomeScreenPreview() {
             ScreenData(weeks = ResultState.Success(Data.getData())),
             Modifier,
             navHostController = rememberNavController()
-        )
+        ) {
+
+        }
     }
 }
