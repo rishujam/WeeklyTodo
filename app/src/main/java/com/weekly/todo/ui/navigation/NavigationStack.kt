@@ -38,7 +38,11 @@ fun NavigationStack(
                 }
             )
         ) {
-            HabitScreen(habitId = it.arguments?.getInt("habitId"), screenData, modifier)
+            HabitScreen(
+                habitId = it.arguments?.getInt("habitId"),
+                screenData.weeks.data.orEmpty(),
+                modifier
+            )
         }
         composable(route = Screen.HabitCreation.route) {
             HabitCreationScreen(modifier, navController) {

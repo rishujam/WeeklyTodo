@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -103,6 +104,7 @@ fun HomeScreen(
                         WeekComposable(
                             item,
                             index == weeks.data.size - 1,
+                            navHostController = navHostController,
                             onEvent
                         )
                     }
@@ -135,7 +137,12 @@ fun HomeScreen(
 }
 
 @Composable
-fun WeekComposable(week: Week, isLastItem: Boolean, onEvent: (UIEvent) -> Unit) {
+fun WeekComposable(
+    week: Week,
+    isLastItem: Boolean,
+    navHostController: NavHostController,
+    onEvent: (UIEvent) -> Unit
+) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val paddingEnd = if (isLastItem) 16.dp else 0.dp
@@ -171,7 +178,7 @@ fun WeekComposable(week: Week, isLastItem: Boolean, onEvent: (UIEvent) -> Unit) 
         )
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(week.habits) { index, habit ->
-                HabitComposable(habit) {
+                HabitComposable(habit, navHostController) {
                     onEvent(
                         UIEvent.HabitProgressUpdate(
                             habit.copy(progress = it),
@@ -187,6 +194,7 @@ fun WeekComposable(week: Week, isLastItem: Boolean, onEvent: (UIEvent) -> Unit) 
 @Composable
 fun HabitComposable(
     habit: Habit,
+    navHostController: NavHostController,
     onProgressChange: (Int) -> Unit
 ) {
     var dragProgress by remember { mutableFloatStateOf(habit.progress.toFloat()) } // float for smooth drag
@@ -219,6 +227,9 @@ fun HabitComposable(
             }
             .onGloballyPositioned { coordinates ->
                 totalWidthPx = coordinates.size.width.toFloat()
+            }
+            .clickable {
+                navHostController.navigate(Screen.Habit.route + "?habitId=${habit.id}")
             }
     ) {
         val progressFraction = dragProgress / maxSteps

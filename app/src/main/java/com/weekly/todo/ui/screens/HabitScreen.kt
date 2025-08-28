@@ -1,5 +1,6 @@
 package com.weekly.todo.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -42,6 +44,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.weekly.todo.R
+import com.weekly.todo.data.Data
+import com.weekly.todo.data.model.Habit
+import com.weekly.todo.data.model.Week
 import com.weekly.todo.ui.ScreenData
 import com.weekly.todo.ui.theme.Background
 import com.weekly.todo.ui.theme.InterFont
@@ -52,196 +57,230 @@ import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WarningRed
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import com.weekly.todo.util.ResultState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun HabitScreen(habitId: Int?, screenData: ScreenData, modifier: Modifier) {
-    Column(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.45f)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                .background(Background)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White)
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-                    text = "Lifetime Report",
-                    fontSize = 18.sp,
-                    fontFamily = InterFont,
-                    color = TextDark,
-                    fontWeight = FontWeight.SemiBold
-                )
-                BarGraph(listOf(3f, 4f, 0f, 1f, 7f), maxValue = 7f)
+fun HabitScreen(habitId: Int?, weeks: List<Week>, modifier: Modifier) {
+    val context = LocalContext.current
+    habitId?.let {
+        var habit: Habit? = null
+        var totalWeeks = 0
+        var totalProgress = 0
+        for(week in weeks) {
+            val localHabit = week.habits.find { it.id == habitId }
+            if(localHabit != null) {
+                habit = localHabit
+                totalWeeks++
+                totalProgress += localHabit.progress
             }
         }
-        Column(
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .fillMaxSize()
-                .background(Background)
-        ) {
-            BasicTextField(
-                value = "Exercise",
-                onValueChange = {  },
-                modifier = Modifier
-                    .padding(start = 32.dp, end = 32.dp, bottom = 8.dp)
-                    .fillMaxWidth(),
-                textStyle = TextStyle(
-                    fontSize = 24.sp,
-                    fontFamily = InterFont,
-                    color = TextDark,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .padding(start = 16.dp, end = 16.dp)
-                    .background(Outline)
-            )
-            Text(
-                modifier = Modifier.padding(start = 32.dp, top = 8.dp),
-                text = "Date Created: March 15, 2024",
-                fontSize = 14.sp,
-                fontFamily = InterFont,
-                color = TextLight
-            )
-            Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                Row(
+        val weeklyAvg = totalWeeks / totalProgress.toFloat()
+        habit?.let {
+            val dateCreated = formatMillisToDate(it.dateCreated)
+            Column(modifier = modifier.fillMaxSize()) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 24.dp, start = 16.dp, end = 16.dp)
+                        .fillMaxHeight(0.45f)
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                        .background(Background)
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth(0.33f)
-                            .clip(RoundedCornerShape(12.dp))
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp))
                             .background(Color.White)
-                            .padding(vertical = 16.dp, horizontal = 8.dp)
                     ) {
-                        Image(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.week_icon),
-                            contentDescription = "week_icon"
-                        )
                         Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "Weekly Target",
-                            fontSize = 12.sp,
-                            fontFamily = InterFont,
-                            color = TextLight
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "5 Times",
-                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                            text = "Lifetime Report",
+                            fontSize = 18.sp,
                             fontFamily = InterFont,
                             color = TextDark,
                             fontWeight = FontWeight.SemiBold
                         )
+                        BarGraph(listOf(3f, 4f, 0f, 1f, 7f), maxValue = 7f)
                     }
-                    Spacer(Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White)
-                            .padding(vertical = 16.dp, horizontal = 8.dp)
-                    ) {
-                        Image(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.chart_icon),
-                            contentDescription = "week_icon"
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "Weekly Average",
-                            fontSize = 12.sp,
-                            fontFamily = InterFont,
-                            color = TextLight
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "4.2 Times",
-                            fontSize = 12.sp,
-                            fontFamily = InterFont,
-                            color = TextDark,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                    Spacer(Modifier.width(16.dp))
-                    Column(
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .fillMaxSize()
+                        .background(Background)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp).fillMaxWidth(),
+                        text = habit.title,
+                        fontFamily = InterFont,
+                        color = TextDark,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp
+                    )
+                    Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White)
-                            .padding(vertical = 16.dp, horizontal = 8.dp)
-                    ) {
-                        Image(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.calendar_icon),
-                            contentDescription = "week_icon"
+                            .height(1.dp)
+                            .padding(start = 16.dp, end = 16.dp)
+                            .background(Outline)
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 32.dp, top = 8.dp),
+                        text = "Date Created: $dateCreated",
+                        fontSize = 14.sp,
+                        fontFamily = InterFont,
+                        color = TextLight
+                    )
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp, start = 16.dp, end = 16.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.33f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.White)
+                                    .padding(vertical = 16.dp, horizontal = 8.dp)
+                            ) {
+                                Image(
+                                    modifier = Modifier.size(24.dp),
+                                    painter = painterResource(R.drawable.week_icon),
+                                    contentDescription = "week_icon"
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "Weekly Target",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextLight
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "${habit.maxWeight} Times",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextDark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.5f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.White)
+                                    .padding(vertical = 16.dp, horizontal = 8.dp)
+                            ) {
+                                Image(
+                                    modifier = Modifier.size(24.dp),
+                                    painter = painterResource(R.drawable.chart_icon),
+                                    contentDescription = "week_icon"
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "Weekly Average",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextLight
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "$weeklyAvg Times",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextDark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Spacer(Modifier.width(16.dp))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.White)
+                                    .padding(vertical = 16.dp, horizontal = 8.dp)
+                            ) {
+                                Image(
+                                    modifier = Modifier.size(24.dp),
+                                    painter = painterResource(R.drawable.calendar_icon),
+                                    contentDescription = "week_icon"
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "Total Weeks",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextLight
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    text = "$totalWeeks Weeks",
+                                    fontSize = 12.sp,
+                                    fontFamily = InterFont,
+                                    color = TextDark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+                    Row(modifier = Modifier.padding(16.dp)) {
+                        val myId = "inlineContent"
+                        val text = buildAnnotatedString {
+                            appendInlineContent(myId, "[icon]")
+                            append("Delete Habit")
+                        }
+                        val inlineContent = mapOf(
+                            Pair(
+                                myId,
+                                InlineTextContent(
+                                    Placeholder(
+                                        width = 24.sp,
+                                        height = 24.sp,
+                                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                                    )
+                                ) {
+                                    Icon(imageVector = Icons.Outlined.Delete,"", tint = Color.White)
+                                }
+                            )
                         )
                         Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "Total Weeks",
-                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(WarningRed)
+                                .padding(vertical = 12.dp),
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            text = text,
+                            fontSize = 16.sp,
                             fontFamily = InterFont,
-                            color = TextLight
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                            text = "12 Weeks",
-                            fontSize = 12.sp,
-                            fontFamily = InterFont,
-                            color = TextDark,
-                            fontWeight = FontWeight.SemiBold
+                            inlineContent = inlineContent
                         )
                     }
                 }
             }
-            Row(modifier = Modifier.padding(16.dp)) {
-                val myId = "inlineContent"
-                val text = buildAnnotatedString {
-                    appendInlineContent(myId, "[icon]")
-                    append("Delete Habit")
-                }
-                val inlineContent = mapOf(
-                    Pair(
-                        myId,
-                        InlineTextContent(
-                            Placeholder(
-                                width = 24.sp,
-                                height = 24.sp,
-                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                            )
-                        ) {
-                            Icon(imageVector = Icons.Outlined.Delete,"", tint = Color.White)
-                        }
-                    )
-                )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(WarningRed)
-                        .padding(vertical = 12.dp),
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    text = text,
-                    fontSize = 16.sp,
-                    fontFamily = InterFont,
-                    inlineContent = inlineContent
-                )
-            }
+        } ?: run {
+            Toast.makeText(context, "Habit not found", Toast.LENGTH_SHORT).show()
         }
+    } ?: run {
+        Toast.makeText(context, "Habit not found", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -269,7 +308,6 @@ fun BarGraph(
                     .fillMaxHeight()
             ) {
                 val canvasHeight = size.height
-
                 values.forEachIndexed { index, value ->
                     val barHeight = (value / maxValue) * canvasHeight
                     val left = index * (barWidth + spaceBetweenBars)
@@ -291,6 +329,11 @@ fun BarGraph(
 @Composable
 fun HabitScreenPreview() {
     WeeklyTodoTheme {
-        HabitScreen(1, ScreenData(ResultState.Success(emptyList())), Modifier)
+        HabitScreen(1, Data.getData(), Modifier)
     }
+}
+
+private fun formatMillisToDate(millis: Long): String {
+    val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+    return sdf.format(Date(millis))
 }
