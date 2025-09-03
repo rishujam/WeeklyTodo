@@ -4,6 +4,6 @@ data class Habit(
     val id: Int,
     val title: String,
     val maxWeight: Int,
-    val progress: Int = 0,
+    var progress: Int = 0,
     val dateCreated: Long = System.currentTimeMillis()
 )

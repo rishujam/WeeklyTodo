@@ -118,6 +118,10 @@ class MainViewModel @Inject constructor (
         lastWeekNo: Int,
         lastRecordedHabits: List<Habit>
     ): List<Week> {
+        val habits = lastRecordedHabits.map {
+            it.progress = 0
+            it
+        }
         val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
         val parts = lastWeekRange.split(" - ")
         require(parts.size == 2) { "Invalid week range format: $lastWeekRange" }
@@ -136,7 +140,7 @@ class MainViewModel @Inject constructor (
                 Week(
                     weekNo = weekNo,
                     weekRange = weekRange,
-                    habits = lastRecordedHabits
+                    habits = habits
                 )
             )
             weekStart = weekStart.plusWeeks(1)
