@@ -90,7 +90,7 @@ fun HomeScreen(
         ) {
             Text(
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp),
-                text = "Habit Tracker",
+                text = "Weekly",
                 fontSize = 24.sp,
                 fontFamily = InterFont,
                 fontWeight = FontWeight.Bold,

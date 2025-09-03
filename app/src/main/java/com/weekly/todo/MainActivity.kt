@@ -14,6 +14,10 @@ import com.weekly.todo.ui.navigation.NavigationStack
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+//TODO Add back button on both screens
+//TODO Test Splash Screen on both android 12 and 13
+//TODO Enable Delete habit button only on current week
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
