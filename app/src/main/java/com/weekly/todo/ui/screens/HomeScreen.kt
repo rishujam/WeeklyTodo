@@ -91,7 +91,11 @@ fun HomeScreen(
         Column {
             val weeks = screenData.weeks
             if (weeks is ResultState.Success && weeks.data != null) {
-                val state = rememberLazyListState()
+                val state = rememberLazyListState(
+                    initialFirstVisibleItemIndex = if (weeks.data.isNotEmpty())
+                        weeks.data.size - 1
+                    else 0
+                )
                 val flingBehavior = rememberSnapFlingBehavior(state)
                 LazyRow(
                     modifier = Modifier
