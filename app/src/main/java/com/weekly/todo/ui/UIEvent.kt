@@ -10,4 +10,5 @@ sealed class UIEvent {
         val week: Week
     ) : UIEvent()
     data class DeleteHabit(val habit: Habit, val week: Week) : UIEvent()
+    data object ClearUiEffect : UIEvent()
 }

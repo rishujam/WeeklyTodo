@@ -16,7 +16,7 @@ import com.weekly.todo.ui.screens.HomeScreen
 @Composable
 fun NavigationStack(
     modifier: Modifier,
-    screenData: ScreenData,
+    state: ScreenData,
     onEvent: (UIEvent) -> Unit
 ) {
     val navController = rememberNavController()
@@ -25,7 +25,7 @@ fun NavigationStack(
             HomeScreen(
                 navHostController = navController,
                 modifier = modifier,
-                screenData = screenData,
+                screenData = state,
                 onEvent = onEvent
             )
         }
@@ -40,7 +40,7 @@ fun NavigationStack(
         ) {
             HabitScreen(
                 habitId = it.arguments?.getInt("habitId"),
-                screenData.weeks.data.orEmpty(),
+                state.weeks,
                 modifier,
                 navController,
                 onEvent

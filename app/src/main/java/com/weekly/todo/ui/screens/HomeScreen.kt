@@ -1,6 +1,5 @@
 package com.weekly.todo.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +30,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +53,7 @@ import com.weekly.todo.data.Data
 import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
 import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.UIEffect
 import com.weekly.todo.ui.UIEvent
 import com.weekly.todo.ui.navigation.Screen
 import com.weekly.todo.ui.theme.Background
@@ -62,8 +63,6 @@ import com.weekly.todo.ui.theme.Primary
 import com.weekly.todo.ui.theme.TextDark
 import com.weekly.todo.ui.theme.TextLight
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
-import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
-import com.weekly.todo.util.ResultState
 import kotlin.math.roundToInt
 
 @Composable
@@ -74,27 +73,33 @@ fun HomeScreen(
     onEvent: (UIEvent) -> Unit
 ) {
     val context = LocalContext.current
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Background)
-    ) {
-        Text(
-            modifier = Modifier.padding(start = 16.dp, top = 24.dp),
-            text = "Habit Tracker",
-            fontSize = 24.sp,
-            fontFamily = InterFont,
-            fontWeight = FontWeight.Bold,
-            color = TextDark
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        Column {
-            val weeks = screenData.weeks
-            if (weeks is ResultState.Success && weeks.data != null) {
+    LaunchedEffect(screenData.uiEffect) {
+        when(screenData.uiEffect) {
+            is UIEffect.ShowToast -> {
+                Toast.makeText(context, screenData.uiEffect.message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
+        }
+        onEvent(UIEvent.ClearUiEffect)
+    }
+    if(screenData.weeks.isNotEmpty()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Background)
+        ) {
+            Text(
+                modifier = Modifier.padding(start = 16.dp, top = 24.dp),
+                text = "Habit Tracker",
+                fontSize = 24.sp,
+                fontFamily = InterFont,
+                fontWeight = FontWeight.Bold,
+                color = TextDark
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Column {
                 val state = rememberLazyListState(
-                    initialFirstVisibleItemIndex = if (weeks.data.isNotEmpty())
-                        weeks.data.size - 1
-                    else 0
+                    initialFirstVisibleItemIndex = screenData.weeks.size - 1
                 )
                 val flingBehavior = rememberSnapFlingBehavior(state)
                 LazyRow(
@@ -104,10 +109,10 @@ fun HomeScreen(
                     state = state,
                     flingBehavior = flingBehavior
                 ) {
-                    itemsIndexed(weeks.data) { index, item ->
+                    itemsIndexed(screenData.weeks) { index, item ->
                         WeekComposable(
                             item,
-                            index == weeks.data.size - 1,
+                            index == screenData.weeks.size - 1,
                             navHostController = navHostController,
                             onEvent
                         )
@@ -129,15 +134,11 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-            } else if (weeks is ResultState.Error) {
-                Toast.makeText(context, weeks.message, Toast.LENGTH_SHORT).show()
-                Log.d(DEBUG_LOG_TAG, "Error loading weeks")
-            } else {
-                Log.d(DEBUG_LOG_TAG, "Loading weeks")
             }
-        }
 
+        }
     }
+
 }
 
 @Composable
@@ -270,7 +271,7 @@ fun HabitComposable(
 fun HomeScreenPreview() {
     WeeklyTodoTheme {
         HomeScreen(
-            ScreenData(weeks = ResultState.Success(Data.getData())),
+            ScreenData(weeks = Data.getData()),
             Modifier,
             navHostController = rememberNavController()
         ) {

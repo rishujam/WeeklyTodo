@@ -10,9 +10,9 @@ import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
 import com.weekly.todo.data.repo.WeekRepository
 import com.weekly.todo.ui.ScreenData
+import com.weekly.todo.ui.UIEffect
 import com.weekly.todo.ui.UIEvent
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
-import com.weekly.todo.util.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -33,7 +33,7 @@ class MainViewModel @Inject constructor (
         onAppStart()
     }
 
-    var state by mutableStateOf(ScreenData(ResultState.Loading()))
+    var state by mutableStateOf(ScreenData(emptyList()))
 
     fun onEvent(event: UIEvent) {
         when(event) {
@@ -46,33 +46,11 @@ class MainViewModel @Inject constructor (
             is UIEvent.DeleteHabit -> {
                 deleteHabit(event.habit.id, event.week)
             }
-        }
-    }
-
-    private fun addNewHabit(newHabit: Habit) = viewModelScope.launch {
-        state.weeks.data?.last()?.let { currentWeek ->
-            state = state.copy(
-                weeks = ResultState.Loading()
-            )
-            val id = if(currentWeek.habits.isEmpty()) 1 else {
-                currentWeek.habits.last().id + 1
+            is UIEvent.ClearUiEffect -> {
+                state = state.copy(
+                    uiEffect = null
+                )
             }
-            val habit = newHabit.copy(
-                id = id
-            )
-            val currentWeekId = currentWeek.weekRange
-            val updatedHabits = currentWeek.habits.toMutableList()
-            updatedHabits.add(habit)
-            repo.updateHabits(currentWeekId, updatedHabits)
-            state = state.copy(weeks = ResultState.Loading())
-            val weeks = repo.getWeeks()
-            state = state.copy(
-                weeks = ResultState.Success(weeks)
-            )
-        } ?: run {
-            state = state.copy(
-                weeks = ResultState.Error("Unknown Error")
-            )
         }
     }
 
@@ -81,14 +59,14 @@ class MainViewModel @Inject constructor (
         if(weeks.isEmpty()) {
             // Create a empty week object and upsert it to DB
             val currWeek = Week(
-                weekRange = getCurrentWeekRange(),
+                weekRange = generateCurrentWeekRange(),
                 weekNo = 1,
                 emptyList()
             )
             repo.addWeek(currWeek)
             Log.d(DEBUG_LOG_TAG, "new first week added")
         } else {
-            val currentWeekRange = getCurrentWeekRange()
+            val currentWeekRange = generateCurrentWeekRange()
             val lastWeek = weeks.last()
             if(lastWeek.weekRange != currentWeekRange) {
                 val missingWeeks = generateMissingWeeks(
@@ -102,10 +80,33 @@ class MainViewModel @Inject constructor (
         }
         val updatedWeeks = repo.getWeeks()
         isAppInitialisationInProgress = false
-        state = state.copy(weeks = ResultState.Success(updatedWeeks))
+        state = state.copy(weeks = updatedWeeks)
     }
 
-    private fun getCurrentWeekRange(): String {
+    private fun addNewHabit(newHabit: Habit) = viewModelScope.launch {
+        state.weeks.last().let { currentWeek ->
+            state = state.copy(
+                isLoading = true
+            )
+            val id = if(currentWeek.habits.isEmpty()) 1 else {
+                currentWeek.habits.last().id + 1
+            }
+            val habit = newHabit.copy(
+                id = id
+            )
+            val currentWeekId = currentWeek.weekRange
+            val updatedHabits = currentWeek.habits.toMutableList()
+            updatedHabits.add(habit)
+            repo.updateHabits(currentWeekId, updatedHabits)
+            val weeks = repo.getWeeks()
+            state = state.copy(
+                isLoading = false,
+                weeks = weeks
+            )
+        }
+    }
+
+    private fun generateCurrentWeekRange(): String {
         val today = LocalDate.now()
         val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         val sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
@@ -150,15 +151,23 @@ class MainViewModel @Inject constructor (
     }
 
     private fun updateHabit(updatedHabit: Habit, week: Week) = viewModelScope.launch {
-        val updatedHabits = week.habits.toMutableList()
-        val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
-        if (index != -1) {
-            updatedHabits[index] = updatedHabit
-            repo.updateHabits(week.weekRange, updatedHabits)
-        } else {
+        val currentWeekRange = state.weeks.last().weekRange
+        if(week.weekRange != currentWeekRange) {
             state = state.copy(
-                weeks = ResultState.Error("Cannot Update Habit: Habit with id=${updatedHabit.id} not found in week ${week.weekRange}")
+                uiEffect = UIEffect.ShowToast("You cannot update past week progress.")
             )
+        } else {
+            val updatedHabits = week.habits.toMutableList()
+            val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
+            if (index != -1) {
+                updatedHabits[index] = updatedHabit
+                repo.updateHabits(week.weekRange, updatedHabits)
+            } else {
+                state = state.copy(
+                    uiEffect = UIEffect.ShowToast("Cannot Update Habit: Habit ${updatedHabit.title}" +
+                            " not found in week ${week.weekRange}")
+                )
+            }
         }
     }
 
@@ -170,11 +179,11 @@ class MainViewModel @Inject constructor (
             repo.updateHabits(week.weekRange, updatedHabits)
             val weeks = repo.getWeeks()
             state = state.copy(
-                weeks = ResultState.Success(weeks)
+                weeks = weeks
             )
         } else {
             state = state.copy(
-                weeks = ResultState.Error("Error deleting habit.")
+                uiEffect = UIEffect.ShowToast("Error deleting habit.")
             )
         }
     }

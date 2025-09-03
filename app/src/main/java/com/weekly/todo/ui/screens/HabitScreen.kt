@@ -60,6 +60,7 @@ import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun HabitScreen(
@@ -85,6 +86,7 @@ fun HabitScreen(
             }
         }
         val weeklyAvg = totalWeeks / totalProgress.toFloat()
+        val roundedWeeklyAvg = (weeklyAvg * 100).roundToInt() / 100f
         habit?.let {
             val dateCreated = formatMillisToDate(it.dateCreated)
             Column(modifier = modifier.fillMaxSize()) {
@@ -206,7 +208,7 @@ fun HabitScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 8.dp),
-                                    text = "$weeklyAvg Times",
+                                    text = "$roundedWeeklyAvg Times",
                                     fontSize = 12.sp,
                                     fontFamily = InterFont,
                                     color = TextDark,
