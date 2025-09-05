@@ -114,7 +114,8 @@ fun HomeScreen(
                             item,
                             index == screenData.weeks.size - 1,
                             navHostController = navHostController,
-                            onEvent
+                            isOnlyItem = screenData.weeks.size == 1,
+                            onEvent = onEvent,
                         )
                     }
                 }
@@ -145,16 +146,18 @@ fun HomeScreen(
 fun WeekComposable(
     week: Week,
     isLastItem: Boolean,
+    isOnlyItem: Boolean,
     navHostController: NavHostController,
     onEvent: (UIEvent) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val paddingEnd = if (isLastItem) 16.dp else 0.dp
+    val width = if(isOnlyItem) screenWidth else screenWidth - 32.dp
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .width(screenWidth - 32.dp)
+            .width(width)
             .padding(start = 16.dp, end = paddingEnd)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
