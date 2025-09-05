@@ -186,13 +186,8 @@ fun WeekComposable(
         )
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(week.habits) { index, habit ->
-                HabitComposable(habit, navHostController) {
-                    onEvent(
-                        UIEvent.HabitProgressUpdate(
-                            habit.copy(progress = it),
-                            week
-                        )
-                    )
+                HabitComposable(habit, isLastItem, navHostController) {
+                    onEvent(UIEvent.HabitProgressUpdate(habit.copy(progress = it)))
                 }
             }
         }
@@ -202,10 +197,12 @@ fun WeekComposable(
 @Composable
 fun HabitComposable(
     habit: Habit,
+    isLastWeek: Boolean,
     navHostController: NavHostController,
     onProgressChange: (Int) -> Unit
 ) {
-    var dragProgress by remember { mutableFloatStateOf(habit.progress.toFloat()) } // float for smooth drag
+    val context = LocalContext.current
+    var dragProgress by remember { mutableFloatStateOf(habit.progress.toFloat()) }
     var totalWidthPx by remember { mutableFloatStateOf(0f) }
     val maxSteps = habit.maxWeight
     Box(
@@ -228,8 +225,17 @@ fun HabitComposable(
                     },
                     onDragEnd = {
                         val snapped = dragProgress.roundToInt()
-                        dragProgress = snapped.toFloat()
-                        onProgressChange(snapped)
+                        if (isLastWeek) {
+                            dragProgress = snapped.toFloat()
+                            onProgressChange(snapped)
+                        } else {
+                            dragProgress = habit.progress.toFloat()
+                            Toast.makeText(
+                                context,
+                                "Previous week data cannot be updated",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 )
             }

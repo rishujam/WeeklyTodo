@@ -41,7 +41,7 @@ class MainViewModel @Inject constructor (
                 addNewHabit(newHabit = event.habit)
             }
             is UIEvent.HabitProgressUpdate -> {
-                updateHabit(event.updatedHabit, event.week)
+                updateHabit(event.updatedHabit)
             }
             is UIEvent.DeleteHabit -> {
                 deleteHabit(event.habit.id)
@@ -150,24 +150,25 @@ class MainViewModel @Inject constructor (
         return weeks
     }
 
-    private fun updateHabit(updatedHabit: Habit, week: Week) = viewModelScope.launch {
-        val currentWeekRange = state.weeks.last().weekRange
-        if(week.weekRange != currentWeekRange) {
+    /**
+     * Updates only happens in the ongoing week.
+     */
+    private fun updateHabit(updatedHabit: Habit) = viewModelScope.launch {
+        val week = state.weeks.last()
+        val updatedHabits = week.habits.toMutableList()
+        val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
+        if (index != -1) {
+            updatedHabits[index] = updatedHabit
+            repo.updateHabits(week.weekRange, updatedHabits)
+            val weeks = repo.getWeeks()
             state = state.copy(
-                uiEffect = UIEffect.ShowToast("You cannot update past week progress.")
+                weeks = weeks
             )
         } else {
-            val updatedHabits = week.habits.toMutableList()
-            val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
-            if (index != -1) {
-                updatedHabits[index] = updatedHabit
-                repo.updateHabits(week.weekRange, updatedHabits)
-            } else {
-                state = state.copy(
-                    uiEffect = UIEffect.ShowToast("Cannot Update Habit: Habit ${updatedHabit.title}" +
-                            " not found in week ${week.weekRange}")
-                )
-            }
+            state = state.copy(
+                uiEffect = UIEffect.ShowToast("Cannot Update Habit: Habit ${updatedHabit.title}" +
+                        " not found in week ${week.weekRange}")
+            )
         }
     }
 

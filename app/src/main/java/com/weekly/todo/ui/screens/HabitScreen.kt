@@ -90,42 +90,34 @@ fun HabitScreen(
         val roundedWeeklyAvg = (weeklyAvg * 100).roundToInt() / 100f
         habit?.let {
             val dateCreated = formatMillisToDate(it.dateCreated)
-            Column(modifier = modifier.fillMaxSize()) {
+            Column(modifier = modifier.fillMaxSize().background(Background)) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable {
+                                navHostController.navigateUp()
+                            },
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                    )
+                    Text(
+                        modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+                        text = "Lifetime Report",
+                        fontSize = 18.sp,
+                        fontFamily = InterFont,
+                        color = TextDark,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
                         .fillMaxHeight(0.45f)
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                        .background(Background)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
                 ) {
-                    Row {
-                        Image(
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .clickable {
-                                    navHostController.navigateUp()
-                                },
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            text = "Lifetime Report",
-                            fontSize = 18.sp,
-                            fontFamily = InterFont,
-                            color = TextDark,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                    ) {
-                        BarGraph(progressList, maxValue = habit.maxWeight.toFloat())
-                    }
+                    BarGraph(progressList, maxValue = habit.maxWeight.toFloat())
                 }
                 Column(
                     modifier = Modifier
