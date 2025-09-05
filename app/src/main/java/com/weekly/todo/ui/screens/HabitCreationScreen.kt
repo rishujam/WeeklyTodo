@@ -58,9 +58,13 @@ fun HabitCreationScreen(
         var habitWeight by remember { mutableStateOf("") }
         Row(modifier = Modifier.fillMaxWidth()) {
             Image(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable {
+                        navHostController.navigateUp()
+                    },
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back"
+                contentDescription = "Back",
             )
             Text(
                 modifier = Modifier.padding(top = 16.dp),

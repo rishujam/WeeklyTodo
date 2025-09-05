@@ -44,7 +44,7 @@ class MainViewModel @Inject constructor (
                 updateHabit(event.updatedHabit, event.week)
             }
             is UIEvent.DeleteHabit -> {
-                deleteHabit(event.habit.id, event.week)
+                deleteHabit(event.habit.id)
             }
             is UIEvent.ClearUiEffect -> {
                 state = state.copy(
@@ -171,19 +171,19 @@ class MainViewModel @Inject constructor (
         }
     }
 
-    private fun deleteHabit(habitId: Int, week: Week) = viewModelScope.launch {
-        val updatedHabits = week.habits.toMutableList()
+    /**
+     * Deletes habit from the ongoing week
+     */
+    private fun deleteHabit(habitId: Int) = viewModelScope.launch {
+        val ongoingWeek = state.weeks.last()
+        val updatedHabits = ongoingWeek.habits.toMutableList()
         val index = updatedHabits.indexOfFirst { it.id == habitId }
         if (index != -1) {
             updatedHabits.removeAt(index)
-            repo.updateHabits(week.weekRange, updatedHabits)
+            repo.updateHabits(ongoingWeek.weekRange, updatedHabits)
             val weeks = repo.getWeeks()
             state = state.copy(
                 weeks = weeks
-            )
-        } else {
-            state = state.copy(
-                uiEffect = UIEffect.ShowToast("Error deleting habit.")
             )
         }
     }

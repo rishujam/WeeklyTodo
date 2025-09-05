@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -97,20 +98,32 @@ fun HabitScreen(
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                         .background(Background)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                    ) {
+                    Row {
+                        Image(
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .clickable {
+                                    navHostController.navigateUp()
+                                },
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                        )
                         Text(
-                            modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                            modifier = Modifier.padding(bottom = 16.dp),
                             text = "Lifetime Report",
                             fontSize = 18.sp,
                             fontFamily = InterFont,
                             color = TextDark,
                             fontWeight = FontWeight.SemiBold
                         )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                    ) {
                         BarGraph(progressList, maxValue = habit.maxWeight.toFloat())
                     }
                 }
