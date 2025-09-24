@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "WeeklyTodo"
 include(":app")
+include(":shared")

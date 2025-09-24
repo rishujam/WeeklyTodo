@@ -126,7 +126,8 @@ class MainViewModel @Inject constructor (
         val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
         val parts = lastWeekRange.split(" - ")
         require(parts.size == 2) { "Invalid week range format: $lastWeekRange" }
-        val lastStart = LocalDate.parse(parts[0].trim(), formatter)
+        val normalized = parts[0].trim().replace("Sept", "Sep")
+        val lastStart = LocalDate.parse(normalized, formatter)
             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)) // normalize to Monday
         val nextWeekStart = lastStart.plusWeeks(1)
         val today = LocalDate.now()

@@ -14,6 +14,9 @@ import com.weekly.todo.ui.navigation.NavigationStack
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+//TODO - Add Edit feature
+//TODO - Update previous week progress
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
