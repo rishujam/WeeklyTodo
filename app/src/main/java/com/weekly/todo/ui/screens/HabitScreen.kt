@@ -86,9 +86,10 @@ fun HabitScreen(
                 totalProgress += localHabit.progress
             }
         }
-        val weeklyAvg = totalWeeks / totalProgress.toFloat()
-        val roundedWeeklyAvg = (weeklyAvg * 100).roundToInt() / 100f
         habit?.let {
+            val weeklyAvgRatio = (totalProgress.toFloat() / (totalWeeks * habit.maxWeight)) * 100
+            val weeklyAvg = ((habit.maxWeight.toFloat() / 100f) * weeklyAvgRatio)
+            val weeklyAvgRounded = (weeklyAvg * 10).roundToInt() / 10f
             val dateCreated = formatMillisToDate(it.dateCreated)
             Column(modifier = modifier.fillMaxSize().background(Background)) {
                 Row(modifier = Modifier.fillMaxWidth()) {
@@ -213,7 +214,7 @@ fun HabitScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 8.dp),
-                                    text = "$roundedWeeklyAvg Times",
+                                    text = "$weeklyAvgRounded Times",
                                     fontSize = 12.sp,
                                     fontFamily = InterFont,
                                     color = TextDark,

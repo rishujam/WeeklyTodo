@@ -23,7 +23,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor (
+class MainViewModel @Inject constructor(
     private val repo: WeekRepository
 ) : ViewModel() {
 
@@ -36,16 +36,19 @@ class MainViewModel @Inject constructor (
     var state by mutableStateOf(ScreenData(emptyList()))
 
     fun onEvent(event: UIEvent) {
-        when(event) {
+        when (event) {
             is UIEvent.NewHabitCreated -> {
                 addNewHabit(newHabit = event.habit)
             }
+
             is UIEvent.HabitProgressUpdate -> {
                 updateHabit(event.updatedHabit)
             }
+
             is UIEvent.DeleteHabit -> {
                 deleteHabit(event.habit.id)
             }
+
             is UIEvent.ClearUiEffect -> {
                 state = state.copy(
                     uiEffect = null
@@ -56,7 +59,7 @@ class MainViewModel @Inject constructor (
 
     private fun onAppStart() = viewModelScope.launch {
         val weeks = repo.getWeeks()
-        if(weeks.isEmpty()) {
+        if (weeks.isEmpty()) {
             // Create a empty week object and upsert it to DB
             val currWeek = Week(
                 weekRange = generateCurrentWeekRange(),
@@ -68,7 +71,7 @@ class MainViewModel @Inject constructor (
         } else {
             val currentWeekRange = generateCurrentWeekRange()
             val lastWeek = weeks.last()
-            if(lastWeek.weekRange != currentWeekRange) {
+            if (lastWeek.weekRange != currentWeekRange) {
                 val missingWeeks = generateMissingWeeks(
                     lastWeek.weekRange,
                     lastWeek.weekNo,
@@ -88,7 +91,7 @@ class MainViewModel @Inject constructor (
             state = state.copy(
                 isLoading = true
             )
-            val id = if(currentWeek.habits.isEmpty()) 1 else {
+            val id = if (currentWeek.habits.isEmpty()) 1 else {
                 currentWeek.habits.last().id + 1
             }
             val habit = newHabit.copy(
@@ -167,8 +170,37 @@ class MainViewModel @Inject constructor (
             )
         } else {
             state = state.copy(
-                uiEffect = UIEffect.ShowToast("Cannot Update Habit: Habit ${updatedHabit.title}" +
-                        " not found in week ${week.weekRange}")
+                uiEffect = UIEffect.ShowToast(
+                    "Cannot Update Habit: Habit ${updatedHabit.title}" +
+                            " not found in week ${week.weekRange}"
+                )
+            )
+        }
+    }
+
+    private fun updateHabitProgress(habitId: Int, progress: Int) = viewModelScope.launch {
+
+    }
+
+    /**
+     * This will only update the title for the habit in the ongoing and upcoming weeks.
+     */
+    private fun updateHabitTitle(habitId: Int, title: String) = viewModelScope.launch {
+        val currentWeek = state.weeks.last()
+        val updatedHabits = currentWeek.habits.toMutableList()
+        val index = updatedHabits.indexOfFirst { it.id == habitId }
+        if (index != -1) {
+            updatedHabits[index] = updatedHabits[index].copy(title = title)
+            repo.updateHabits(currentWeek.weekRange, updatedHabits)
+            val weeks = repo.getWeeks()
+            state = state.copy(
+                weeks = weeks
+            )
+        } else {
+            state = state.copy(
+                uiEffect = UIEffect.ShowToast(
+                    "Cannot Update Habit: Habit not found in week ${currentWeek.weekRange}"
+                )
             )
         }
     }
