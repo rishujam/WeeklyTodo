@@ -1,12 +1,15 @@
 package com.weekly.todo.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -27,11 +31,16 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -41,6 +50,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -118,7 +128,21 @@ fun HabitScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White)
                 ) {
-                    BarGraph(progressList, maxValue = habit.maxWeight.toFloat())
+                    val dataList = mutableListOf(30,60,90,50,10, 5, 20, 70, 50, 0)
+                    val floatValue = mutableListOf<Float>()
+                    val datesList = mutableListOf("Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8", "Week 9", "Next Week")
+
+                    dataList.forEachIndexed { index, value ->
+                        floatValue.add(index = index, element = value.toFloat()/dataList.max().toFloat())
+                    }
+                    BoxWithConstraints {
+                        val graphHeight = maxHeight
+                        BarGraph(
+                            graphBarData = floatValue,
+                            xAxisScaleData = datesList,
+                            height = graphHeight
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -311,47 +335,6 @@ fun HabitScreen(
     }
 }
 
-@Composable
-fun BarGraph(
-    values: List<Float>,
-    maxValue: Float = (values.maxOrNull() ?: 0f),
-    barWidth: Float = 120f,
-    spaceBetweenBars: Float = 40f
-) {
-    val scrollState = rememberScrollState()
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(scrollState)
-        ) {
-            Canvas(
-                modifier = Modifier
-                    .width((values.size * (barWidth + spaceBetweenBars)).dp)
-                    .fillMaxHeight()
-            ) {
-                val canvasHeight = size.height
-                values.forEachIndexed { index, value ->
-                    val barHeight = (value / maxValue) * canvasHeight
-                    val left = index * (barWidth + spaceBetweenBars)
-                    val top = canvasHeight - barHeight
-
-                    drawRoundRect(
-                        color = Primary,
-                        topLeft = Offset(left, top),
-                        size = Size(barWidth, barHeight),
-                        cornerRadius = CornerRadius(10f, 10f)
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun HabitScreenPreview() {
@@ -363,4 +346,81 @@ fun HabitScreenPreview() {
 private fun formatMillisToDate(millis: Long): String {
     val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     return sdf.format(Date(millis))
+}
+
+
+@Composable
+fun BarGraph(
+    graphBarData: List<Float>,
+    xAxisScaleData: List<String>,
+    height: Dp
+) {
+    val xAxisScaleHeight = 42.dp
+    val barShape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+
+    val listState = rememberLazyListState()
+
+    // Scroll to last item when screen opens
+    LaunchedEffect(Unit) {
+        listState.scrollToItem(graphBarData.size - 1)
+    }
+
+    LazyRow(
+        state = listState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height + xAxisScaleHeight)
+            .padding(top = 16.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        items(graphBarData.size) { index ->
+            var animationTriggered by remember {
+                mutableStateOf(false)
+            }
+            val graphBarHeight by animateFloatAsState(
+                targetValue = if (animationTriggered) graphBarData[index] else 0f,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    delayMillis = 0
+                )
+            )
+            LaunchedEffect(key1 = true) {
+                animationTriggered = true
+            }
+            val paddingStart = if(index == 0) 16.dp else 0.dp
+            Column(
+                modifier = Modifier.fillMaxHeight().padding(start = paddingStart, end = 16.dp),
+                verticalArrangement = Top,
+                horizontalAlignment = CenterHorizontally
+            ) {
+                // Each Graph
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .clip(barShape)
+                        .width(20.dp)
+                        .weight(1f)
+                        .background(Color.Transparent),
+                    contentAlignment = BottomCenter
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(barShape)
+                            .fillMaxWidth()
+                            .fillMaxHeight(graphBarHeight)
+                            .background(Primary)
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(bottom = 3.dp),
+                    text = xAxisScaleData[index],
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
 }
