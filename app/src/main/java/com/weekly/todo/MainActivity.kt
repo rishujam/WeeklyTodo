@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.weekly.todo.ui.navigation.NavigationStack
 import com.weekly.todo.ui.theme.WeeklyTodoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.weekly.todo.SharedLogger
 
 //TODO - Add Edit feature
 //TODO - Update previous week progress
@@ -24,6 +25,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Test shared module integration
+        SharedLogger.i("MainActivity", "KMM integration working! MainActivity created successfully")
+        
         installSplashScreen().setKeepOnScreenCondition {
             viewModel.isAppInitialisationInProgress
         }

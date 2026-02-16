@@ -13,12 +13,17 @@ struct ContentView: View {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text(ComWeeklyTodoGreeting().greet())
+            Text(Greetings().greet())
         }
         .padding()
+        .onAppear {
+            // Test shared module integration
+            SharedLogger.shared.i(tag: "ContentView", message: "KMM integration working! iOS ContentView appeared successfully")
+        }
     }
 }
 
 #Preview {
     ContentView()
 }
+
