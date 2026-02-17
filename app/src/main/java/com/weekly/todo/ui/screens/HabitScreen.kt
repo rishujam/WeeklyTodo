@@ -86,21 +86,23 @@ fun HabitScreen(
         var habit: Habit? = null
         var totalWeeks = 0
         var totalProgress = 0
-        val progressList = mutableListOf<Float>()
-        for(week in weeks) {
+        val graphProgress = mutableListOf<Float>()
+        val datesList = mutableListOf<String>()
+        weeks.forEachIndexed { index, week ->
             val localHabit = week.habits.find { it.id == habitId }
             if(localHabit != null) {
                 habit = localHabit
+                datesList.add("Week ${index + 1}")
                 totalWeeks++
-                progressList.add(localHabit.progress.toFloat())
+                graphProgress.add(localHabit.progress.toFloat() / localHabit.maxWeight.toFloat())
                 totalProgress += localHabit.progress
             }
         }
-        habit?.let {
-            val weeklyAvgRatio = (totalProgress.toFloat() / (totalWeeks * habit.maxWeight)) * 100
-            val weeklyAvg = ((habit.maxWeight.toFloat() / 100f) * weeklyAvgRatio)
+        habit?.let { nHabit ->
+            val weeklyAvgRatio = (totalProgress.toFloat() / (totalWeeks * nHabit.maxWeight)) * 100
+            val weeklyAvg = ((nHabit.maxWeight.toFloat() / 100f) * weeklyAvgRatio)
             val weeklyAvgRounded = (weeklyAvg * 10).roundToInt() / 10f
-            val dateCreated = formatMillisToDate(it.dateCreated)
+            val dateCreated = formatMillisToDate(nHabit.dateCreated)
             Column(modifier = modifier.fillMaxSize().background(Background)) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Image(
@@ -128,17 +130,10 @@ fun HabitScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White)
                 ) {
-                    val dataList = mutableListOf(30,60,90,50,10, 5, 20, 70, 50, 0)
-                    val floatValue = mutableListOf<Float>()
-                    val datesList = mutableListOf("Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8", "Week 9", "Next Week")
-
-                    dataList.forEachIndexed { index, value ->
-                        floatValue.add(index = index, element = value.toFloat()/dataList.max().toFloat())
-                    }
                     BoxWithConstraints {
                         val graphHeight = maxHeight
                         BarGraph(
-                            graphBarData = floatValue,
+                            graphBarData = graphProgress,
                             xAxisScaleData = datesList,
                             height = graphHeight
                         )
@@ -152,7 +147,7 @@ fun HabitScreen(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 8.dp).fillMaxWidth(),
-                        text = habit.title,
+                        text = nHabit.title,
                         fontFamily = InterFont,
                         color = TextDark,
                         fontWeight = FontWeight.SemiBold,
@@ -205,7 +200,7 @@ fun HabitScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 8.dp),
-                                    text = "${habit.maxWeight} Times",
+                                    text = "${nHabit.maxWeight} Times",
                                     fontSize = 12.sp,
                                     fontFamily = InterFont,
                                     color = TextDark,
@@ -314,7 +309,7 @@ fun HabitScreen(
                                 .background(WarningRed)
                                 .padding(vertical = 12.dp)
                                 .clickable {
-                                    onEvent(UIEvent.DeleteHabit(habit, weeks.last()))
+                                    onEvent(UIEvent.DeleteHabit(nHabit, weeks.last()))
                                     navHostController.navigateUp()
                                 },
                             textAlign = TextAlign.Center,
