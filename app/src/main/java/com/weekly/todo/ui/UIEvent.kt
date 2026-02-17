@@ -8,6 +8,10 @@ sealed class UIEvent {
     data class HabitProgressUpdate(
         val updatedHabit: Habit
     ) : UIEvent()
+    data class PrevWeekProgressUpdate(
+        val updatedHabit: Habit,
+        val weekRange: String
+    ) : UIEvent()
     data class DeleteHabit(val habit: Habit, val week: Week) : UIEvent()
     data object ClearUiEffect : UIEvent()
 }

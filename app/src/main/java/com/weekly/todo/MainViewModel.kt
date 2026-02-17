@@ -42,7 +42,11 @@ class MainViewModel @Inject constructor(
             }
 
             is UIEvent.HabitProgressUpdate -> {
-                updateHabit(event.updatedHabit)
+                updateHabitProgress(event.updatedHabit)
+            }
+
+            is UIEvent.PrevWeekProgressUpdate -> {
+                updateHabitProgress(event.updatedHabit, event.weekRange)
             }
 
             is UIEvent.DeleteHabit -> {
@@ -156,9 +160,33 @@ class MainViewModel @Inject constructor(
 
     /**
      * Updates only happens in the ongoing week.
+     * This is optimized for current week.
      */
-    private fun updateHabit(updatedHabit: Habit) = viewModelScope.launch {
+    private fun updateHabitProgress(updatedHabit: Habit) = viewModelScope.launch {
         val week = state.weeks.last()
+        updateHabitInWeek(updatedHabit, week)
+    }
+
+    /**
+     * Use this to update habit in previous weeks.
+     */
+    private fun updateHabitProgress(
+        updatedHabit: Habit,
+        weekRange: String
+    ) = viewModelScope.launch {
+        val week = state.weeks.find { it.weekRange == weekRange }
+        week?.let {
+            updateHabitInWeek(updatedHabit, week)
+        } ?: run {
+            state = state.copy(
+                uiEffect = UIEffect.ShowToast(
+                    "Cannot Update Habit: Week $weekRange not found"
+                )
+            )
+        }
+    }
+
+    private suspend fun updateHabitInWeek(updatedHabit: Habit, week: Week) {
         val updatedHabits = week.habits.toMutableList()
         val index = updatedHabits.indexOfFirst { it.id == updatedHabit.id }
         if (index != -1) {
@@ -176,10 +204,6 @@ class MainViewModel @Inject constructor(
                 )
             )
         }
-    }
-
-    private fun updateHabitProgress(habitId: Int, progress: Int) = viewModelScope.launch {
-
     }
 
     /**
