@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Required for Firebase Analytics but not used for advertising purposes -->
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"
-        tools:node="remove" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".WeeklyApp"
