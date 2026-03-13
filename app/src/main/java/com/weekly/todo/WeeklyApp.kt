@@ -25,6 +25,10 @@ class WeeklyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         firebaseAnalytics = Firebase.analytics
+        
+        // Disable advertising features to prevent advertising ID collection
+        firebaseAnalytics.setAnalyticsCollectionEnabled(true)
+        
         CoroutineScope(Dispatchers.IO).launch {
             val userUUID = getUserUUID()
             InMemoryData.userUUID = userUUID

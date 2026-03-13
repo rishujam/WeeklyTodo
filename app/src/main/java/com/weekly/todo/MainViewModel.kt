@@ -195,9 +195,13 @@ class MainViewModel @Inject constructor(
         week?.let {
             updateHabitInWeek(updatedHabit, week)
         } ?: run {
+            val message = "Cannot Update Habit: Week $weekRange not found"
+            val bundle = Bundle()
+            bundle.putString(Constants.Analytics.KEY_MSG, message)
+            firebaseAnalytics.logEvent(Constants.Analytics.EVENT_ERROR, bundle)
             state = state.copy(
                 uiEffect = UIEffect.ShowToast(
-                    "Cannot Update Habit: Week $weekRange not found"
+                    message
                 )
             )
         }
@@ -214,11 +218,13 @@ class MainViewModel @Inject constructor(
                 weeks = weeks
             )
         } else {
+            val message = "Cannot Update Habit: Habit ${updatedHabit.title}" +
+                    " not found in week ${week.weekRange}"
+            val bundle = Bundle()
+            bundle.putString(Constants.Analytics.KEY_MSG, message)
+            firebaseAnalytics.logEvent(Constants.Analytics.EVENT_ERROR, bundle)
             state = state.copy(
-                uiEffect = UIEffect.ShowToast(
-                    "Cannot Update Habit: Habit ${updatedHabit.title}" +
-                            " not found in week ${week.weekRange}"
-                )
+                uiEffect = UIEffect.ShowToast(message)
             )
         }
     }
