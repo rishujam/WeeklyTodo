@@ -14,4 +14,11 @@ sealed class UIEvent {
     ) : UIEvent()
     data class DeleteHabit(val habit: Habit, val week: Week) : UIEvent()
     data object ClearUiEffect : UIEvent()
+    data class AnalyticsScreenView(
+        val screenName: String
+    ) : UIEvent()
+    data class AnalyticsClick(
+        val screenName: String,
+        val on: String
+    ) : UIEvent()
 }

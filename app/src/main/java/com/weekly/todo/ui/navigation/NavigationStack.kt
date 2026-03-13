@@ -1,6 +1,7 @@
 package com.weekly.todo.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,6 +23,9 @@ fun NavigationStack(
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
+            LaunchedEffect(Unit) {
+                onEvent(UIEvent.AnalyticsScreenView(Screen.Home.route))
+            }
             HomeScreen(
                 navHostController = navController,
                 modifier = modifier,
@@ -38,6 +42,9 @@ fun NavigationStack(
                 }
             )
         ) {
+            LaunchedEffect(Unit) {
+                onEvent(UIEvent.AnalyticsScreenView(Screen.Habit.route))
+            }
             HabitScreen(
                 habitId = it.arguments?.getInt("habitId"),
                 state.weeks,
@@ -47,6 +54,9 @@ fun NavigationStack(
             )
         }
         composable(route = Screen.HabitCreation.route) {
+            LaunchedEffect(Unit) {
+                onEvent(UIEvent.AnalyticsScreenView(Screen.HabitCreation.route))
+            }
             HabitCreationScreen(modifier, navController) {
                 onEvent(UIEvent.NewHabitCreated(it))
             }

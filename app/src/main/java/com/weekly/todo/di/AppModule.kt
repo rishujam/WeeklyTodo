@@ -2,6 +2,7 @@ package com.weekly.todo.di
 
 import android.content.Context
 import androidx.room.Room
+import com.weekly.todo.data.local.AppPreferences
 import com.weekly.todo.data.local.WeekDao
 import com.weekly.todo.data.local.WeekDatabase
 import dagger.Module
@@ -31,5 +32,13 @@ object AppModule {
     @Singleton
     fun provideWeekDao(db: WeekDatabase): WeekDao {
         return db.weekDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppPreferences(
+        @ApplicationContext context: Context
+    ): AppPreferences {
+        return AppPreferences(context)
     }
 }

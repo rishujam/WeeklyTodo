@@ -1,17 +1,23 @@
 package com.weekly.todo
 
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.weekly.todo.data.model.Habit
 import com.weekly.todo.data.model.Week
 import com.weekly.todo.data.repo.WeekRepository
 import com.weekly.todo.ui.ScreenData
 import com.weekly.todo.ui.UIEffect
 import com.weekly.todo.ui.UIEvent
+import com.weekly.todo.ui.navigation.Screen
+import com.weekly.todo.util.Constants
 import com.weekly.todo.util.Constants.DEBUG_LOG_TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -28,9 +34,11 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     var isAppInitialisationInProgress = true
+    private var firebaseAnalytics: FirebaseAnalytics
 
     init {
         onAppStart()
+        firebaseAnalytics = Firebase.analytics
     }
 
     var state by mutableStateOf(ScreenData(emptyList()))
@@ -57,6 +65,15 @@ class MainViewModel @Inject constructor(
                 state = state.copy(
                     uiEffect = null
                 )
+            }
+            is UIEvent.AnalyticsScreenView -> {
+                val bundle = Bundle()
+                bundle.putString(Constants.Analytics.SCREEN_NAME, event.screenName)
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
+            }
+
+            is UIEvent.AnalyticsClick -> {
+
             }
         }
     }
